@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screens/splash_screen.dart';
+
+import 'routes/app_routes.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(const FarmaciaApp());
@@ -10,10 +12,12 @@ class FarmaciaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Farmacia App',
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      theme: AppTheme.light(),
+      initialRoute: AppRoutes.splash,
+      routes: AppRoutes.routes,
     );
   }
 }

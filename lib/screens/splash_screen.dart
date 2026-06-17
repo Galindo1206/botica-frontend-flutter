@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'home_screen.dart';
-import 'login_screen.dart';
+import '../core/session/session_manager.dart';
+import '../routes/app_routes.dart';
+import '../theme/app_theme.dart';
+import '../widgets/brand_logo.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,40 +13,65 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final sessionManager = SessionManager();
+  bool visible = false;
+
   @override
   void initState() {
     super.initState();
+    Future.microtask(() => setState(() => visible = true));
     checkLogin();
   }
 
   Future<void> checkLogin() async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    await Future.delayed(const Duration(milliseconds: 1300));
+    final isLoggedIn = await sessionManager.isLoggedIn;
 
     if (!mounted) return;
-
-    if (token != null && token.isNotEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    }
+    Navigator.pushReplacementNamed(
+      context,
+      isLoggedIn ? AppRoutes.home : AppRoutes.login,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: AppColors.green,
       body: Center(
-        child: Text(
-          'Farmacia App',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        child: AnimatedOpacity(
+          opacity: visible ? 1 : 0,
+          duration: const Duration(milliseconds: 520),
+          curve: Curves.easeOut,
+          child: AnimatedScale(
+            scale: visible ? 1 : 0.92,
+            duration: const Duration(milliseconds: 520),
+            curve: Curves.easeOutBack,
+            child: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                BrandLogo(size: 126, elevated: true),
+                SizedBox(height: 24),
+                Text(
+                  'KunanApp',
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Salud clara, rápida y cerca de ti',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

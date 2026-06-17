@@ -1,25 +1,11 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/product_model.dart';
-import '../utils/api_config.dart';
+import '../repositories/product_repository.dart';
 
 class ProductService {
-  Future<List<Product>> getProducts(String token) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/products');
+  final ProductRepository _productRepository;
 
-    final response = await http.get(
-      url,
-      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
-    );
+  ProductService({ProductRepository? productRepository})
+    : _productRepository = productRepository ?? ProductRepository();
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-
-      final List productsJson = data;
-
-      return productsJson.map((json) => Product.fromJson(json)).toList();
-    } else {
-      throw Exception('Error al cargar productos');
-    }
-  }
+  Future<List<Product>> getProducts() => _productRepository.getProducts();
 }
